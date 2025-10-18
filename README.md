@@ -39,7 +39,7 @@ Smooth Transitions - CSS animations and transforms
 ---
 
 ## 🌐 Live Demo
-https://omarhussien98.github.io/BOOKINGHUB/
+[https://omarhussien98.github.io/BOOKINGHUB/](https://omarhussien98.github.io/Future-Shop/)
 ---
 
 ## 🚀 Getting Started
