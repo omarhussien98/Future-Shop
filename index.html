@@ -1,0 +1,1328 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8" />
+    <meta name="description" content="Future Shop - Step into the Future and see the Magic" />
+    <title>Future Shop</title>
+    <link href="https://fonts.googleapis.com/css?family=Crimson+Text:700|Playfair+Display:400,900&display=swap" rel="stylesheet">
+    <script src="script.js" defer></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        html, body { height: 100%; font-family: "Crimson Text", "Playfair Display", serif; scroll-behavior: smooth; }
+        
+        body::-webkit-scrollbar { width: 8px; }
+        body::-webkit-scrollbar-track { background: rgba(39, 27, 73, 0.8); }
+        body::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #b2b237, #fca5a5); border-radius: 4px; }
+
+        .frame-container, .product-page { background: linear-gradient(180deg, rgba(39, 27, 73, 1) 0%, rgba(93, 65, 175, 1) 100%); min-height: 100vh; padding: 20px; }
+        .product-page { display: none; padding: 40px 20px; }
+        .product-page.active { display: block; }
+
+        .sidebar-nav { width: 80px; padding: 20px 10px; display: flex; flex-direction: column; align-items: center; gap: 15px; background: rgba(255, 255, 255, 0.1); border-radius: 20px; backdrop-filter: blur(10px); position: fixed; left: 20px; top: 20px; z-index: 1000; }
+        .nav-section { width: 100%; border: 2px solid #fca5a5; border-radius: 10px; padding: 8px; transition: all 0.3s ease; }
+        .nav-section.active, .nav-section:hover { border-color: #93c5fd; transform: translateY(-2px); }
+        .nav-section.active { background: rgba(147, 197, 253, 0.2); }
+        
+        .nav-btn { display: flex; align-items: center; justify-content: center; width: 100%; padding: 12px; background: transparent; border: none; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; color: #ffffff; position: relative; overflow: hidden; }
+        .nav-btn.active { color: #93c5fd; background-color: rgba(147, 197, 253, 0.3); }
+        .nav-btn:hover { background-color: rgba(147, 197, 253, 0.3); }
+        .nav-btn:active { transform: scale(0.95); }
+        
+        .nav-icon { height: 24px; width: 24px; fill: currentColor; stroke: currentColor; }
+        .nav-btn.active .nav-icon { fill: #93c5fd; stroke: #93c5fd; }
+
+        .cart-count { position: absolute; top: -5px; right: -5px; background: linear-gradient(135deg, #b2b237, #fca5a5); color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 0.7rem; display: none; align-items: center; justify-content: center; font-weight: bold; z-index: 10; }
+        .cart-count.show { display: flex; }
+
+        .main-content { flex: 1; padding: 0 40px 0 120px; position: relative; }
+        
+        .header, .product-header { display: flex; align-items: center; gap: 15px; margin-bottom: 60px; padding-top: 20px; }
+        .logo-circle, .product-logo-circle { width: 45px; height: 45px; background: linear-gradient(135deg, #b2b237, #fca5a5); border-radius: 50%; box-shadow: 0 4px 15px rgba(178, 178, 55, 0.3); animation: float 3s ease-in-out infinite; }
+        .site-title, .product-site-title { text-shadow: 0px 4px 4px #00000080; font-family: "Crimson Text", serif; font-weight: 700; color: #b2b237; font-size: 2.5rem; letter-spacing: 2.1px; }
+
+        .hero { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; margin-bottom: 80px; }
+        .hero-text { text-align: left; }
+        .hero-title { text-shadow: 0px 2px 5px #00000073; font-family: "Playfair Display", serif; font-weight: 900; color: #b2b237; font-size: 3rem; letter-spacing: 3px; line-height: 1.4; }
+        .hero-line { display: block; margin-bottom: 25px; position: relative; }
+        .hero-line::after { content: ''; position: absolute; bottom: -10px; left: 0; width: 100px; height: 3px; background: linear-gradient(90deg, #b2b237, transparent); border-radius: 2px; }
+        
+        .hero-image img { width: 100%; max-width: 500px; height: auto; border-radius: 20px; object-fit: cover; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); transition: transform 0.3s ease; }
+        .hero-image img:hover { transform: translateY(-10px) scale(1.02); }
+
+        .product-container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+        .product-main-image { width: 100%; max-width: 400px; height: auto; border-radius: 20px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); }
+        
+        .color-options { display: flex; gap: 15px; justify-content: center; }
+        .color-option { width: 30px; height: 30px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; transition: all 0.3s ease; }
+        .color-option:hover { transform: scale(1.2); }
+        .color-option.active { border-color: #b2b237; }
+
+        .product-info-section { color: white; }
+        .product-title { font-family: "Playfair Display", serif; font-size: 2.5rem; color: #b2b237; margin-bottom: 20px; }
+        .product-description { font-size: 1.1rem; line-height: 1.6; margin-bottom: 30px; opacity: 0.9; }
+        .product-price { font-size: 2rem; color: #b2b237; font-weight: bold; margin-bottom: 30px; }
+
+        .feature-list { list-style: none; margin-top: 15px; }
+        .feature-list li { margin-bottom: 10px; padding-left: 20px; position: relative; }
+        .feature-list li::before { content: '✓'; position: absolute; left: 0; color: #b2b237; font-weight: bold; }
+
+        .quantity-selector { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; }
+        .quantity-btn { width: 40px; height: 40px; border: 2px solid #b2b237; background: transparent; color: #b2b237; border-radius: 50%; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; }
+        .quantity-btn:hover { background: #b2b237; color: white; }
+        .quantity-display { font-size: 1.5rem; color: white; min-width: 50px; text-align: center; }
+
+        .add-to-cart-btn, .product-card-btn { padding: 15px 40px; background: linear-gradient(135deg, #b2b237, #fca5a5); border: none; border-radius: 25px; color: white; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: all 0.3s ease; }
+        .add-to-cart-btn:hover, .product-card-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(178, 178, 55, 0.4); }
+
+        .back-to-home, .nav-category { display: inline-flex; align-items: center; gap: 10px; color: #b2b237; background: transparent; border: 2px solid #b2b237; padding: 10px 20px; border-radius: 25px; cursor: pointer; transition: all 0.3s ease; font-size: 1rem; }
+        .back-to-home:hover, .nav-category:hover { background: #b2b237; color: white; }
+
+        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding: 20px 0; }
+        .nav-categories { display: flex; gap: 15px; }
+
+        .featured-products { margin: 60px 0; }
+        .section-title { text-align: center; color: #b2b237; font-size: 2.5rem; margin-bottom: 40px; font-family: "Playfair Display", serif; }
+
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; margin-top: 40px; }
+        .product-card { background: rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 25px; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); transition: all 0.3s ease; cursor: pointer; text-align: center; }
+        .product-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); }
+        .product-card-image { width: 100%; height: 200px; object-fit: contain; border-radius: 15px; margin-bottom: 15px; }
+        .product-card-title { color: #ffffff; font-size: 1.3rem; margin-bottom: 10px; font-family: "Crimson Text", serif; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); display: flex; align-items: center; justify-content: center; z-index: 10000; backdrop-filter: blur(5px); }
+        .modal-content { background: linear-gradient(180deg, rgba(39, 27, 73, 1) 0%, rgba(93, 65, 175, 1) 100%); border-radius: 20px; width: 90%; max-width: 500px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.2); overflow: hidden; }
+        .modal-header { padding: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h2 { color: #b2b237; font-family: "Playfair Display", serif; margin: 0; }
+        .close-btn { background: none; border: none; color: #b2b237; font-size: 24px; cursor: pointer; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; }
+        .close-btn:hover { background: rgba(178, 178, 55, 0.2); }
+        .modal-body { padding: 20px; }
+        .search-input { width: 100%; padding: 15px; border-radius: 10px; border: 2px solid rgba(178, 178, 55, 0.5); background: rgba(255, 255, 255, 0.1); color: white; font-size: 1rem; margin-bottom: 15px; transition: all 0.3s ease; }
+        .search-input:focus { outline: none; border-color: #b2b237; box-shadow: 0 0 10px rgba(178, 178, 55, 0.5); }
+        .search-results { max-height: 200px; overflow-y: auto; margin-top: 10px; }
+        .search-result-item { padding: 10px 15px; border-radius: 8px; margin-bottom: 5px; background: rgba(255, 255, 255, 0.05); cursor: pointer; transition: all 0.3s ease; color: white; }
+        .search-result-item:hover { background: rgba(178, 178, 55, 0.2); transform: translateX(5px); }
+        .modal-footer { padding: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1); display: flex; gap: 10px; justify-content: flex-end; }
+        .search-btn, .cancel-btn { padding: 10px 20px; border-radius: 25px; border: none; cursor: pointer; font-weight: bold; transition: all 0.3s ease; }
+        .search-btn { background: linear-gradient(135deg, #b2b237, #fca5a5); color: white; }
+        .search-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(178, 178, 55, 0.4); }
+        .cancel-btn { background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid rgba(255, 255, 255, 0.3); }
+        .cancel-btn:hover { background: rgba(255, 255, 255, 0.2); }
+
+        .progress-bar { position: fixed; top: 0; left: 0; width: 0%; height: 3px; background: linear-gradient(90deg, #b2b237, #fca5a5); z-index: 1000; transition: width 0.3s ease; }
+        .back-to-top { position: fixed; bottom: 30px; right: 30px; width: 50px; height: 50px; background: linear-gradient(135deg, #b2b237, #fca5a5); border: none; border-radius: 50%; color: white; cursor: pointer; display: none; align-items: center; justify-content: center; z-index: 1000; transition: all 0.3s ease; }
+        .back-to-top:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(178, 178, 55, 0.4); }
+
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 1s ease-in; }
+
+        @media (max-width: 1024px) {
+            .hero { gap: 40px; }
+            .hero-title { font-size: 2.5rem; }
+            .site-title { font-size: 2rem; }
+            .product-container { grid-template-columns: 1fr; gap: 40px; }
+            .products-grid { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+        }
+        @media (max-width: 768px) {
+            .frame-container { flex-direction: column; padding: 15px; }
+            .sidebar-nav { width: 100%; flex-direction: row; justify-content: center; padding: 15px; margin-bottom: 30px; position: relative; left: 0; top: 0; }
+            .nav-section { width: auto; flex: 1; max-width: 70px; }
+            .main-content { padding: 0 20px; }
+            .hero { grid-template-columns: 1fr; text-align: center; gap: 40px; }
+            .hero-text { text-align: center; }
+            .hero-line::after { left: 50%; transform: translateX(-50%); }
+            .site-title { font-size: 1.8rem; }
+            .hero-title { font-size: 2rem; letter-spacing: 2px; }
+            .top-nav { flex-direction: column; gap: 20px; }
+            .nav-categories { flex-wrap: wrap; justify-content: center; }
+            .products-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 480px) {
+            .main-content { padding: 0 10px; }
+            .site-title { font-size: 1.5rem; }
+            .hero-title { font-size: 1.6rem; letter-spacing: 1px; }
+            .nav-section { max-width: 60px; }
+            .hero-image img { max-width: 100%; }
+            .header { margin-bottom: 40px; }
+            .product-title { font-size: 2rem; }
+            .section-title { font-size: 2rem; }
+        }
+
+.frame-container, .product-page {
+    transition: opacity 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+                transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.sidebar-nav {
+    transition: box-shadow 0.4s ease, transform 0.2s ease;
+}
+
+.sidebar-nav:hover {
+    transform: translateX(5px);
+}
+
+.nav-btn {
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.nav-btn:active {
+    transform: scale(0.92);
+}
+
+.nav-section {
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(178, 178, 55, 0.1), 
+        transparent
+    );
+    transition: left 0.6s ease;
+}
+
+.nav-section:hover::before {
+    left: 100%;
+}
+
+body {
+    background: linear-gradient(180deg, rgba(39, 27, 73, 1) 0%, rgba(93, 65, 175, 1) 100%);
+    min-height: 100vh;
+}
+
+.frame-container, .product-page {
+    background: linear-gradient(180deg, rgba(39, 27, 73, 1) 0%, rgba(93, 65, 175, 1) 100%);
+    transition: opacity 0.4s ease;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(180deg, rgba(39, 27, 73, 1) 0%, rgba(93, 65, 175, 1) 100%);
+    min-height: 100vh;
+}
+
+* {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+.frame-container, .product-page {
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.product-page:not(.active) {
+    display: none !important;
+    opacity: 0 !important;
+}
+
+#homePage[style*="display: none"] {
+    opacity: 0 !important;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, rgba(39, 27, 73, 1) 0%, rgba(93, 65, 175, 1) 100%);
+    z-index: -1;
+    pointer-events: none;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 5% auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 700px;
+    direction: rtl;
+}
+
+.close {
+    float: left;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.form-group {
+    margin-bottom: -15px;
+}
+
+.form-group label {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    height: 50%;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.order-summary {
+    border: 1px solid #eee;
+    padding: 15px;
+    border-radius: 5px;
+    margin: 20px 0;
+}
+
+.order-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.total {
+    font-weight: bold;
+    font-size: 18px;
+    text-align: left;
+    border-top: 1px solid #eee;
+    padding-top: 10px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.form-actions button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#cancelCheckout {
+    background-color: #f44336;
+    color: white;
+}
+
+#confirmCheckout {
+    background-color: #4CAF50;
+    color: white;
+}
+
+    
+#checkoutModal .modal-content {
+    background: linear-gradient(180deg, rgba(39, 27, 73, 1) 0%, rgba(93, 65, 175, 1) 100%);
+    color: #fff;
+    border-radius: 20px;
+    padding: 25px 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    max-width: 450px;
+}
+
+#checkoutModal .form-group {
+    margin-bottom: 15px;
+}
+
+#checkoutModal input,
+#checkoutModal select,
+#checkoutModal textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 10px;
+    background: rgba(255,255,255,0.1);
+    color: white;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+#checkoutModal input::placeholder {
+    color: rgba(255,255,255,0.7);
+}
+
+#checkoutModal input:focus,
+#checkoutModal select:focus {
+    outline: none;
+    border-color: #b2b237;
+    background: rgba(255,255,255,0.15);
+}
+
+#checkoutModal select {
+    color: white;
+}
+
+#checkoutModal option {
+    color: black;
+}
+
+#checkoutModal .order-summary {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 15px;
+    padding: 20px;
+    margin: 25px 0;
+    color: white;
+}
+
+#checkoutModal .order-summary h3 {
+    color: #b2b237;
+    margin-bottom: 10px;
+}
+
+#checkoutModal .form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+#checkoutModal #confirmCheckout {
+    background-color: #4CAF50;
+    color: white;
+    font-weight: bold;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#checkoutModal #confirmCheckout:hover {
+    background-color: #45a049;
+    transform: translateY(-2px);
+}
+
+#checkoutModal #cancelCheckout {
+    background-color: #f44336;
+    color: white;
+    font-weight: bold;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#checkoutModal #cancelCheckout:hover {
+    background-color: #e53935;
+    transform: translateY(-2px);
+}
+
+#checkoutModal .modal-content {
+    max-height: 85vh; 
+    overflow-y: auto; 
+    scrollbar-width: thin;
+    scrollbar-color: #b2b237 rgba(255,255,255,0.1);
+}
+
+#checkoutModal .modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+#checkoutModal .modal-content::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #b2b237, #fca5a5);
+    border-radius: 4px;
+}
+
+
+</style>
+</head>
+<body>
+
+    
+
+<div id="checkoutModal" class="modal">
+    <div class="modal-content">
+        
+        <form id="checkoutForm">
+            <div class="form-group">
+                <input type="text" placeholder="Enter your name" required>
+            </div>
+            
+            <div class="form-group">
+                <input type="email" placeholder="email" required>
+            </div>
+            
+            <div class="form-group">
+                <input type="tel" placeholder="phone number" required>
+            </div>
+            
+            <div class="form-group">
+                <input type="text" placeholder="Address" required>
+            </div>
+            
+            <div class="form-row">
+                
+                <div class="form-group">
+                    <input type="text" placeholder="country" required>    
+                </div>
+            </div>
+            
+            <div class="order-summary">
+                <h3>summary</h3>
+                <div id="orderItems"></div>
+                <div class="total">Total: <span id="orderTotal">0</span> USD</div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="button" id="cancelCheckout">cancel</button>
+                <button type="submit" id="confirmCheckout">follow</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+    <div class="progress-bar" id="progressBar"></div>
+    <button class="back-to-top" id="backToTop" aria-label="Back to top">↑</button>
+
+    <!-- Search Modal -->
+    <div id="searchModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header"><h2>Search Products</h2><button class="close-btn" onclick="closeSearchModal()">×</button></div>
+            <div class="modal-body">
+                <input type="text" id="searchInput" placeholder="What are you looking for?" class="search-input">
+                <div class="search-results" id="searchResults"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="search-btn" onclick="searchAndGoToFirstResult()">Search & Go</button>
+                <button class="cancel-btn" onclick="closeSearchModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="homePage" class="frame-container fade-in">
+        <nav class="sidebar-nav" role="navigation" aria-label="Main navigation">
+            <div class="nav-section active">
+                <button class="nav-btn active" aria-label="Home" onclick="handleNavClick(event, 'homePage')">
+                    <svg class="nav-icon" viewBox="0 0 1024 1024"><path d="M946.5 505L560.1 118.8l-25.9-25.9a31.5 31.5 0 0 0-44.4 0L77.5 505a63.9 63.9 0 0 0-18.8 46c.4 35.2 29.7 63.3 64.9 63.3h42.5V940h691.8V614.3h43.4c17.1 0 33.2-6.7 45.3-18.8a63.6 63.6 0 0 0 18.7-45.3c0-17-6.7-33.1-18.8-45.2zM568 868H456V664h112v204zm217.9-325.7V868H632V640c0-22.1-17.9-40-40-40H432c-22.1 0-40 17.9-40 40v228H238.1V542.3h-96l370-369.7 23.1 23.1L882 542.3h-96.1z"/></svg>
+                </button>
+            </div>
+            <div class="nav-section">
+                <button class="nav-btn" aria-label="Search" onclick="openSearchModal()">
+                    <svg class="nav-icon" stroke="currentColor" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </button>
+            </div>
+            <div class="nav-section">
+                <button class="nav-btn" aria-label="Shopping Cart" onclick="openCartModal()">
+                    <svg class="nav-icon" stroke="currentColor" fill="none" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                    <span class="cart-count" id="cartCount">0</span>
+                </button>
+            </div>
+        </nav>
+        <div class="main-content">
+            <header class="header"><div class="logo-circle"></div><h1 class="site-title">FUTURE SHOP</h1></header>
+            <section class="hero">
+                <div class="hero-text">
+                    <h2 class="hero-title"><span class="hero-line">Step into the Future</span><span class="hero-line">Let's see the Magic</span></h2>
+                </div>
+                <div class="hero-image">
+                    <img src="https://c.animaapp.com/mgik8lgs2qDSHe/img/digital-art-and-renaissance-statues--an-unlikely-combination-tha.png" alt="Digital art" loading="lazy" />
+                </div>
+            </section>
+            <section class="featured-products">
+                <h2 class="section-title">Featured Products</h2>
+                <div class="products-grid">
+                    <div class="product-card" onclick="showPage('iphonePage')">
+                        <img src="https://c.animaapp.com/mgl8sxw2yS4NMa/img/iphone-15-plus-256gb-yellow-0195949041990-18102023-01-1.png" alt="iPhone 15" class="product-card-image">
+                        <h3 class="product-card-title">iPhone 15</h3>
+                        <div class="product-card-price">$799.00</div>
+                        <button class="product-card-btn" onclick="event.stopPropagation(); showPage('iphonePage')">View Details</button>
+                    </div>
+                    <div class="product-card" onclick="showPage('smartwatchPage')">
+                        <img src="https://c.animaapp.com/mgimt5cpW5bGTV/img/rendering-smart-home-device--2--1.png" alt="Premium Smartwatch" class="product-card-image">
+                        <h3 class="product-card-title">Premium Smartwatch</h3>
+                        <div class="product-card-price">$150.00</div>
+                        <button class="product-card-btn" onclick="event.stopPropagation(); showPage('smartwatchPage')">View Details</button>
+                    </div>
+                    <div class="product-card" onclick="showPage('airpodsPage')">
+                        <img src="https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/airpods-pro-2-hero-select-202409_FMT_WHH?wid=752&hei=720&fmt=jpeg&qlt=80&.v=1720815933904" alt="AirPods Pro" class="product-card-image">
+                        <h3 class="product-card-title">AirPods Pro</h3>
+                        <div class="product-card-price">$249.00</div>
+                        <button class="product-card-btn" onclick="event.stopPropagation(); showPage('airpodsPage')">View Details</button>
+                    </div>
+                    <div class="product-card" onclick="showPage('macbookPage')">
+                        <img src="https://i.pinimg.com/736x/6f/91/90/6f91905424753098e8ccaf5db262c5fb.jpg" alt="MacBook Air" class="product-card-image">
+                        <h3 class="product-card-title">MacBook Air</h3>
+                        <div class="product-card-price">$999.00</div>
+                        <button class="product-card-btn" onclick="event.stopPropagation(); showPage('macbookPage')">View Details</button>
+                    </div>
+                    <div class="product-card" onclick="showPage('ipadPage')">
+                        <img src="https://i.pinimg.com/736x/01/58/2f/01582f0998933e15c14e1588942bf220.jpg" alt="iPad Pro" class="product-card-image">
+                        <h3 class="product-card-title">iPad Pro</h3>
+                        <div class="product-card-price">$1099.00</div>
+                        <button class="product-card-btn" onclick="event.stopPropagation(); showPage('ipadPage')">View Details</button>
+                    </div>
+                    <div class="product-card" onclick="showPage('watchPage')">
+                        <img src="https://i.pinimg.com/1200x/fd/4f/18/fd4f1898d045b7852113a7dcfd4984d7.jpg" alt="Apple Watch" class="product-card-image">
+                        <h3 class="product-card-title">Apple Watch Series 9</h3>
+                        <div class="product-card-price">$399.00</div>
+                        <button class="product-card-btn" onclick="event.stopPropagation(); showPage('watchPage')">View Details</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div id="cartPage" class="product-page">
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <button class="nav-btn" aria-label="Home" onclick="showPage('homePage')">
+                    <svg class="nav-icon" viewBox="0 0 1024 1024"><path d="M946.5 505L560.1 118.8l-25.9-25.9a31.5 31.5 0 0 0-44.4 0L77.5 505a63.9 63.9 0 0 0-18.8 46c.4 35.2 29.7 63.3 64.9 63.3h42.5V940h691.8V614.3h43.4c17.1 0 33.2-6.7 45.3-18.8a63.6 63.6 0 0 0 18.7-45.3c0-17-6.7-33.1-18.8-45.2zM568 868H456V664h112v204zm217.9-325.7V868H632V640c0-22.1-17.9-40-40-40H432c-22.1 0-40 17.9-40 40v228H238.1V542.3h-96l370-369.7 23.1 23.1L882 542.3h-96.1z"/></svg>
+                </button>
+            </div>
+            <div class="nav-section">
+                <button class="nav-btn" aria-label="Shopping Cart" onclick="openCartModal()">
+                    <svg class="nav-icon" stroke="currentColor" fill="none" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                    <span class="cart-count" id="cartCount8">0</span>
+                </button>
+            </div>
+        </nav>
+        <div class="main-content">
+            <header class="product-header"><div class="product-logo-circle"></div><h1 class="product-site-title">FUTURE SHOP</h1></header>
+            <div class="top-nav"><button class="back-to-home" onclick="showPage('homePage')">← Back to Home</button></div>
+            <div class="cart-container" id="cartContainer"></div>
+        </div>
+    </div>
+
+    <div id="iphonePage" class="product-page">
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <button class="nav-btn" aria-label="Home" onclick="showPage('homePage')">
+                    <svg class="nav-icon" viewBox="0 0 1024 1024"><path d="M946.5 505L560.1 118.8l-25.9-25.9a31.5 31.5 0 0 0-44.4 0L77.5 505a63.9 63.9 0 0 0-18.8 46c.4 35.2 29.7 63.3 64.9 63.3h42.5V940h691.8V614.3h43.4c17.1 0 33.2-6.7 45.3-18.8a63.6 63.6 0 0 0 18.7-45.3c0-17-6.7-33.1-18.8-45.2zM568 868H456V664h112v204zm217.9-325.7V868H632V640c0-22.1-17.9-40-40-40H432c-22.1 0-40 17.9-40 40v228H238.1V542.3h-96l370-369.7 23.1 23.1L882 542.3h-96.1z"/></svg>
+                </button>
+            </div>
+            <div class="nav-section">
+                <button class="nav-btn" aria-label="Search" onclick="openSearchModal()">
+                    <svg class="nav-icon" stroke="currentColor" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </button>
+            </div>
+            <div class="nav-section">
+                <button class="nav-btn" aria-label="Shopping Cart" onclick="openCartModal()">
+                    <svg class="nav-icon" stroke="currentColor" fill="none" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                    <span class="cart-count" id="cartCount2">0</span>
+                </button>
+            </div>
+        </nav>
+        <div class="main-content">
+            <header class="product-header"><div class="product-logo-circle"></div><h1 class="product-site-title">FUTURE SHOP</h1></header>
+            <div class="top-nav">
+                <button class="back-to-home" onclick="showPage('homePage')">← Back to Home</button>
+                <div class="nav-categories">
+                    <button class="nav-category" onclick="showPage('iphonePage')">iPhones</button>
+                    <button class="nav-category" onclick="showPage('smartwatchPage')">Watches</button>
+                    <button class="nav-category" onclick="showPage('airpodsPage')">Headphones</button>
+                    <button class="nav-category" onclick="showPage('macbookPage')">Laptops</button>
+                </div>
+            </div>
+            <div class="product-container">
+                <div class="product-image-section">
+                    <img src="https://c.animaapp.com/mgl8sxw2yS4NMa/img/iphone-15-plus-256gb-yellow-0195949041990-18102023-01-1.png" alt="iPhone 15" class="product-main-image">
+                    <div class="color-options">
+                        <div class="color-option active" style="background: #fde047;"></div>
+                        <div class="color-option" style="background: #dc2626;"></div>
+                        <div class="color-option" style="background: #1e40af;"></div>
+                        <div class="color-option" style="background: #000000;"></div>
+                    </div>
+                </div>
+                <div class="product-info-section">
+                    <h1 class="product-title">iPhone 15</h1>
+                    <p class="product-description">The ultimate camera in your hand. New design. Faster chip. Dynamic Island. And all-day battery life.</p>
+                    <div class="product-features">
+                        <h3 style="color: #b2b237; margin-bottom: 10px;">Key Features:</h3>
+                        <ul class="feature-list">
+                            <li>48MP Main Camera with stunning detail</li>
+                            <li>Powerful A16 Bionic chip</li>
+                            <li>Interactive Dynamic Island</li>
+                            <li>All-day battery life</li>
+                        </ul>
+                    </div>
+                    <div class="product-price">$799.00</div>
+                    <div class="quantity-selector">
+                        <button class="quantity-btn" onclick="decreaseQuantity('iphone')">-</button>
+                        <span class="quantity-display" id="iphoneQuantity">1</span>
+                        <button class="quantity-btn" onclick="increaseQuantity('iphone')">+</button>
+                    </div>
+                    <button class="add-to-cart-btn" onclick="addToCart('iPhone 15', 799, 'iphone')">ADD TO CART</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="smartwatchPage" class="product-page">
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <button class="nav-btn" aria-label="Home" onclick="showPage('homePage')">
+                    <svg class="nav-icon" viewBox="0 0 1024 1024"><path d="M946.5 505L560.1 118.8l-25.9-25.9a31.5 31.5 0 0 0-44.4 0L77.5 505a63.9 63.9 0 0 0-18.8 46c.4 35.2 29.7 63.3 64.9 63.3h42.5V940h691.8V614.3h43.4c17.1 0 33.2-6.7 45.3-18.8a63.6 63.6 0 0 0 18.7-45.3c0-17-6.7-33.1-18.8-45.2zM568 868H456V664h112v204zm217.9-325.7V868H632V640c0-22.1-17.9-40-40-40H432c-22.1 0-40 17.9-40 40v228H238.1V542.3h-96l370-369.7 23.1 23.1L882 542.3h-96.1z"/></svg>
+                </button>
+            </div>
+            <div class="nav-section">
+                <button class="nav-btn" aria-label="Search" onclick="openSearchModal()">
+                    <svg class="nav-icon" stroke="currentColor" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </button>
+            </div>
+            <div class="nav-section">
+                <button class="nav-btn" aria-label="Shopping Cart" onclick="openCartModal()">
+                    <svg class="nav-icon" stroke="currentColor" fill="none" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                    <span class="cart-count" id="cartCount3">0</span>
+                </button>
+            </div>
+        </nav>
+        <div class="main-content">
+            <header class="product-header"><div class="product-logo-circle"></div><h1 class="product-site-title">FUTURE SHOP</h1></header>
+            <div class="top-nav">
+                <button class="back-to-home" onclick="showPage('homePage')">← Back to Home</button>
+                <div class="nav-categories">
+                    <button class="nav-category" onclick="showPage('iphonePage')">iPhones</button>
+                    <button class="nav-category" onclick="showPage('smartwatchPage')">Watches</button>
+                    <button class="nav-category" onclick="showPage('airpodsPage')">Headphones</button>
+                    <button class="nav-category" onclick="showPage('macbookPage')">Laptops</button>
+                </div>
+            </div>
+            <div class="product-container">
+                <div class="product-image-section">
+                    <img src="https://c.animaapp.com/mgimt5cpW5bGTV/img/rendering-smart-home-device--2--1.png" alt="Premium Smartwatch" class="product-main-image">
+                    <div class="color-options">
+                        <div class="color-option active" style="background: #2563eb;"></div>
+                        <div class="color-option" style="background: #dc2626;"></div>
+                        <div class="color-option" style="background: #16a34a;"></div>
+                        <div class="color-option" style="background: #4b5563;"></div>
+                    </div>
+                </div>
+                <div class="product-info-section">
+                    <h1 class="product-title">Premium Smartwatch</h1>
+                    <p class="product-description">A sophisticated smartwatch featuring a square high-resolution display with clear time reading.</p>
+                    <div class="product-features">
+                        <h3 style="color: #b2b237; margin-bottom: 10px;">Key Features:</h3>
+                        <ul class="feature-list">
+                            <li>High-resolution square display</li>
+                            <li>Comfortable sport band with ventilation</li>
+                            <li>Smart notifications</li>
+                            <li>Fitness and health tracking</li>
+                        </ul>
+                    </div>
+                    <div class="product-price">$150.00</div>
+                    <div class="quantity-selector">
+                        <button class="quantity-btn" onclick="decreaseQuantity('smartwatch')">-</button>
+                        <span class="quantity-display" id="smartwatchQuantity">1</span>
+                        <button class="quantity-btn" onclick="increaseQuantity('smartwatch')">+</button>
+                    </div>
+                    <button class="add-to-cart-btn" onclick="addToCart('Premium Smartwatch', 150, 'smartwatch')">ADD TO CART</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="airpodsPage" class="product-page">
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <button class="nav-btn" aria-label="Home" onclick="showPage('homePage')">
+                    <svg class="nav-icon" viewBox="0 0 1024 1024"><path d="M946.5 505L560.1 118.8l-25.9-25.9a31.5 31.5 0 0 0-44.4 0L77.5 505a63.9 63.9 0 0 0-18.8 46c.4 35.2 29.7 63.3 64.9 63.3h42.5V940h691.8V614.3h43.4c17.1 0 33.2-6.7 45.3-18.8a63.6 63.6 0 0 0 18.7-45.3c0-17-6.7-33.1-18.8-45.2zM568 868H456V664h112v204zm217.9-325.7V868H632V640c0-22.1-17.9-40-40-40H432c-22.1 0-40 17.9-40 40v228H238.1V542.3h-96l370-369.7 23.1 23.1L882 542.3h-96.1z"/></svg>
+                </button>
+            </div>
+            <div class="nav-section">
+                <button class="nav-btn" aria-label="Search" onclick="openSearchModal()">
+                    <svg class="nav-icon" stroke="currentColor" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </button>
+            </div>
+            <div class="nav-section">
+                <button class="nav-btn" aria-label="Shopping Cart" onclick="openCartModal()">
+                    <svg class="nav-icon" stroke="currentColor" fill="none" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                    <span class="cart-count" id="cartCount4">0</span>
+                </button>
+            </div>
+        </nav>
+        <div class="main-content">
+            <header class="product-header"><div class="product-logo-circle"></div><h1 class="product-site-title">FUTURE SHOP</h1></header>
+            <div class="top-nav">
+                <button class="back-to-home" onclick="showPage('homePage')">← Back to Home</button>
+                <div class="nav-categories">
+                    <button class="nav-category" onclick="showPage('iphonePage')">iPhones</button>
+                    <button class="nav-category" onclick="showPage('smartwatchPage')">Watches</button>
+                    <button class="nav-category" onclick="showPage('airpodsPage')">Headphones</button>
+                    <button class="nav-category" onclick="showPage('macbookPage')">Laptops</button>
+                </div>
+            </div>
+            <div class="product-container">
+                <div class="product-image-section">
+                    <img src="https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/airpods-pro-2-hero-select-202409_FMT_WHH?wid=752&hei=720&fmt=jpeg&qlt=80&.v=1720815933904" alt="AirPods Pro" class="product-main-image">
+                    <div class="color-options">
+                        <div class="color-option active" style="background: #ffffff; border: 1px solid #ccc;"></div>
+                        <div class="color-option" style="background: #1e40af;"></div>
+                        <div class="color-option" style="background: #dc2626;"></div>
+                    </div>
+                </div>
+                <div class="product-info-section">
+                    <h1 class="product-title">AirPods Pro</h1>
+                    <p class="product-description">Active Noise Cancellation blocks outside noise, so you can immerse yourself in music.</p>
+                    <div class="product-features">
+                        <h3 style="color: #b2b237; margin-bottom: 10px;">Key Features:</h3>
+                        <ul class="feature-list">
+                            <li>Active Noise Cancellation</li>
+                            <li>Transparency mode</li>
+                            <li>Adaptive Audio</li>
+                            <li>MagSafe Charging Case</li>
+                        </ul>
+                    </div>
+                    <div class="product-price">$249.00</div>
+                    <div class="quantity-selector">
+                        <button class="quantity-btn" onclick="decreaseQuantity('airpods')">-</button>
+                        <span class="quantity-display" id="airpodsQuantity">1</span>
+                        <button class="quantity-btn" onclick="increaseQuantity('airpods')">+</button>
+                    </div>
+                    <button class="add-to-cart-btn" onclick="addToCart('AirPods Pro', 249, 'airpods')">ADD TO CART</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="macbookPage" class="product-page">
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <button class="nav-btn" aria-label="Home" onclick="showPage('homePage')">
+                    <svg class="nav-icon" viewBox="0 0 1024 1024"><path d="M946.5 505L560.1 118.8l-25.9-25.9a31.5 31.5 0 0 0-44.4 0L77.5 505a63.9 63.9 0 0 0-18.8 46c.4 35.2 29.7 63.3 64.9 63.3h42.5V940h691.8V614.3h43.4c17.1 0 33.2-6.7 45.3-18.8a63.6 63.6 0 0 0 18.7-45.3c0-17-6.7-33.1-18.8-45.2zM568 868H456V664h112v204zm217.9-325.7V868H632V640c0-22.1-17.9-40-40-40H432c-22.1 0-40 17.9-40 40v228H238.1V542.3h-96l370-369.7 23.1 23.1L882 542.3h-96.1z"/></svg>
+                </button>
+            </div>
+            <div class="nav-section">
+                <button class="nav-btn" aria-label="Search" onclick="openSearchModal()">
+                    <svg class="nav-icon" stroke="currentColor" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </button>
+            </div>
+            <div class="nav-section">
+                <button class="nav-btn" aria-label="Shopping Cart" onclick="openCartModal()">
+                    <svg class="nav-icon" stroke="currentColor" fill="none" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                    <span class="cart-count" id="cartCount5">0</span>
+                </button>
+            </div>
+        </nav>
+        <div class="main-content">
+            <header class="product-header"><div class="product-logo-circle"></div><h1 class="product-site-title">FUTURE SHOP</h1></header>
+            <div class="top-nav">
+                <button class="back-to-home" onclick="showPage('homePage')">← Back to Home</button>
+                <div class="nav-categories">
+                    <button class="nav-category" onclick="showPage('iphonePage')">iPhones</button>
+                    <button class="nav-category" onclick="showPage('smartwatchPage')">Watches</button>
+                    <button class="nav-category" onclick="showPage('airpodsPage')">Headphones</button>
+                    <button class="nav-category" onclick="showPage('macbookPage')">Laptops</button>
+                </div>
+            </div>
+            <div class="product-container">
+                <div class="product-image-section">
+                    <img src="https://i.pinimg.com/736x/6f/91/90/6f91905424753098e8ccaf5db262c5fb.jpg" alt="MacBook Air" class="product-main-image">
+                    <div class="color-options">
+                        <div class="color-option active" style="background: #1e293b;"></div>
+                        <div class="color-option" style="background: #cbd5e1;"></div>
+                        <div class="color-option" style="background: #0f172a;"></div>
+                        <div class="color-option" style="background: #f1f5f9;"></div>
+                    </div>
+                </div>
+                <div class="product-info-section">
+                    <h1 class="product-title">MacBook Air</h1>
+                    <p class="product-description">Supercharged by the Apple M3 chip, MacBook Air is an incredibly capable laptop.</p>
+                    <div class="product-features">
+                        <h3 style="color: #b2b237; margin-bottom: 10px;">Key Features:</h3>
+                        <ul class="feature-list">
+                            <li>Apple M3 chip</li>
+                            <li>13.6-inch Liquid Retina display</li>
+                            <li>Up to 18 hours battery life</li>
+                            <li>Magic Keyboard with Touch ID</li>
+                        </ul>
+                    </div>
+                    <div class="product-price">$999.00</div>
+                    <div class="quantity-selector">
+                        <button class="quantity-btn" onclick="decreaseQuantity('macbook')">-</button>
+                        <span class="quantity-display" id="macbookQuantity">1</span>
+                        <button class="quantity-btn" onclick="increaseQuantity('macbook')">+</button>
+                    </div>
+                    <button class="add-to-cart-btn" onclick="addToCart('MacBook Air', 999, 'macbook')">ADD TO CART</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="ipadPage" class="product-page">
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <button class="nav-btn" aria-label="Home" onclick="showPage('homePage')">
+                    <svg class="nav-icon" viewBox="0 0 1024 1024"><path d="M946.5 505L560.1 118.8l-25.9-25.9a31.5 31.5 0 0 0-44.4 0L77.5 505a63.9 63.9 0 0 0-18.8 46c.4 35.2 29.7 63.3 64.9 63.3h42.5V940h691.8V614.3h43.4c17.1 0 33.2-6.7 45.3-18.8a63.6 63.6 0 0 0 18.7-45.3c0-17-6.7-33.1-18.8-45.2zM568 868H456V664h112v204zm217.9-325.7V868H632V640c0-22.1-17.9-40-40-40H432c-22.1 0-40 17.9-40 40v228H238.1V542.3h-96l370-369.7 23.1 23.1L882 542.3h-96.1z"/></svg>
+                </button>
+            </div>
+            <div class="nav-section">
+                <button class="nav-btn" aria-label="Search" onclick="openSearchModal()">
+                    <svg class="nav-icon" stroke="currentColor" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </button>
+            </div>
+            <div class="nav-section">
+                <button class="nav-btn" aria-label="Shopping Cart" onclick="openCartModal()">
+                    <svg class="nav-icon" stroke="currentColor" fill="none" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                    <span class="cart-count" id="cartCount6">0</span>
+                </button>
+            </div>
+        </nav>
+        <div class="main-content">
+            <header class="product-header"><div class="product-logo-circle"></div><h1 class="product-site-title">FUTURE SHOP</h1></header>
+            <div class="top-nav">
+                <button class="back-to-home" onclick="showPage('homePage')">← Back to Home</button>
+                <div class="nav-categories">
+                    <button class="nav-category" onclick="showPage('iphonePage')">iPhones</button>
+                    <button class="nav-category" onclick="showPage('smartwatchPage')">Watches</button>
+                    <button class="nav-category" onclick="showPage('airpodsPage')">Headphones</button>
+                    <button class="nav-category" onclick="showPage('macbookPage')">Laptops</button>
+                </div>
+            </div>
+            <div class="product-container">
+                <div class="product-image-section">
+                    <img src="https://i.pinimg.com/736x/01/58/2f/01582f0998933e15c14e1588942bf220.jpg" alt="iPad Pro" class="product-main-image">
+                    <div class="color-options">
+                        <div class="color-option active" style="background: #374151;"></div>
+                        <div class="color-option" style="background: #f3f4f6;"></div>
+                    </div>
+                </div>
+                <div class="product-info-section">
+                    <h1 class="product-title">iPad Pro</h1>
+                    <p class="product-description">The ultimate iPad experience. Now with the game-changing M4 chip and advanced display.</p>
+                    <div class="product-features">
+                        <h3 style="color: #b2b237; margin-bottom: 10px;">Key Features:</h3>
+                        <ul class="feature-list">
+                            <li>M4 chip with Neural Engine</li>
+                            <li>Ultra Retina XDR display</li>
+                            <li>Pro cameras with LiDAR Scanner</li>
+                            <li>All-day battery life</li>
+                        </ul>
+                    </div>
+                    <div class="product-price">$1099.00</div>
+                    <div class="quantity-selector">
+                        <button class="quantity-btn" onclick="decreaseQuantity('ipad')">-</button>
+                        <span class="quantity-display" id="ipadQuantity">1</span>
+                        <button class="quantity-btn" onclick="increaseQuantity('ipad')">+</button>
+                    </div>
+                    <button class="add-to-cart-btn" onclick="addToCart('iPad Pro', 1099, 'ipad')">ADD TO CART</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="watchPage" class="product-page">
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <button class="nav-btn" aria-label="Home" onclick="showPage('homePage')">
+                    <svg class="nav-icon" viewBox="0 0 1024 1024"><path d="M946.5 505L560.1 118.8l-25.9-25.9a31.5 31.5 0 0 0-44.4 0L77.5 505a63.9 63.9 0 0 0-18.8 46c.4 35.2 29.7 63.3 64.9 63.3h42.5V940h691.8V614.3h43.4c17.1 0 33.2-6.7 45.3-18.8a63.6 63.6 0 0 0 18.7-45.3c0-17-6.7-33.1-18.8-45.2zM568 868H456V664h112v204zm217.9-325.7V868H632V640c0-22.1-17.9-40-40-40H432c-22.1 0-40 17.9-40 40v228H238.1V542.3h-96l370-369.7 23.1 23.1L882 542.3h-96.1z"/></svg>
+                </button>
+            </div>
+            <div class="nav-section">
+                <button class="nav-btn" aria-label="Search" onclick="openSearchModal()">
+                    <svg class="nav-icon" stroke="currentColor" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </button>
+            </div>
+            <div class="nav-section">
+                <button class="nav-btn" aria-label="Shopping Cart" onclick="openCartModal()">
+                    <svg class="nav-icon" stroke="currentColor" fill="none" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                    <span class="cart-count" id="cartCount7">0</span>
+                </button>
+            </div>
+        </nav>
+        <div class="main-content">
+            <header class="product-header"><div class="product-logo-circle"></div><h1 class="product-site-title">FUTURE SHOP</h1></header>
+            <div class="top-nav">
+                <button class="back-to-home" onclick="showPage('homePage')">← Back to Home</button>
+                <div class="nav-categories">
+                    <button class="nav-category" onclick="showPage('iphonePage')">iPhones</button>
+                    <button class="nav-category" onclick="showPage('smartwatchPage')">Watches</button>
+                    <button class="nav-category" onclick="showPage('airpodsPage')">Headphones</button>
+                    <button class="nav-category" onclick="showPage('macbookPage')">Laptops</button>
+                </div>
+            </div>
+            <div class="product-container">
+                <div class="product-image-section">
+                    <img src="https://i.pinimg.com/1200x/fd/4f/18/fd4f1898d045b7852113a7dcfd4984d7.jpg" alt="Apple Watch" class="product-main-image">
+                    <div class="color-options">
+                        <div class="color-option active" style="background: #374151;"></div>
+                        <div class="color-option" style="background: #dc2626;"></div>
+                        <div class="color-option" style="background: #1e40af;"></div>
+                        <div class="color-option" style="background: #f3f4f6;"></div>
+                    </div>
+                </div>
+                <div class="product-info-section">
+                    <h1 class="product-title">Apple Watch Series 9</h1>
+                    <p class="product-description">The most powerful and connected Apple Watch yet with innovative double-tap gesture.</p>
+                    <div class="product-features">
+                        <h3 style="color: #b2b237; margin-bottom: 10px;">Key Features:</h3>
+                        <ul class="feature-list">
+                            <li>S9 chip for faster performance</li>
+                            <li>Brighter Retina display</li>
+                            <li>Advanced health monitoring</li>
+                            <li>Double-tap gesture control</li>
+                        </ul>
+                    </div>
+                    <div class="product-price">$399.00</div>
+                    <div class="quantity-selector">
+                        <button class="quantity-btn" onclick="decreaseQuantity('watch')">-</button>
+                        <span class="quantity-display" id="watchQuantity">1</span>
+                        <button class="quantity-btn" onclick="increaseQuantity('watch')">+</button>
+                    </div>
+                    <button class="add-to-cart-btn" onclick="addToCart('Apple Watch Series 9', 399, 'watch')">ADD TO CART</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<div class="payment-security-section" style="background: linear-gradient(135deg, rgba(39, 27, 73, 0.95) 0%, rgba(93, 65, 175, 0.9) 100%); padding: 2.5rem 1rem; margin-top: 3rem; border-top: 2px solid #b2b237;">
+    <div style="max-width: 1200px; margin: 0 auto; text-align: center;">
+        
+        <h3 style="color: #b2b237; font-family: 'Playfair Display', serif; margin-bottom: 1.5rem; font-size: 1.8rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+             Secure Payment Methods
+        </h3>
+        
+        <div class="payment-methods" style="display: flex; justify-content: center; align-items: center; gap: 2rem; flex-wrap: wrap; margin-bottom: 2rem;">
+
+            <div class="payment-logo" style="background: white; padding: 0.8rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: all 0.3s ease;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" 
+                     alt="Visa" 
+                     style="height: 25px; width: auto; filter: brightness(0.9);"
+                     title="Visa - Secure Payments">
+            </div>
+            
+            <div class="payment-logo" style="background: white; padding: 0.8rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: all 0.3s ease;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" 
+                     alt="Mastercard" 
+                     style="height: 25px; width: auto;"
+                     title="Mastercard - Secure Payments">
+            </div>
+            
+            <div class="payment-logo" style="background: white; padding: 0.8rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: all 0.3s ease;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg" 
+                     alt="American Express" 
+                     style="height: 25px; width: auto;"
+                     title="American Express - Secure Payments">
+            </div>
+            
+            <div class="payment-logo" style="background: #635bff; padding: 0.8rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: all 0.3s ease;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/8/8b/Stripe_Logo%2C_revised_2016.svg" 
+                     alt="Stripe" 
+                     style="height: 25px; width: auto; filter: brightness(0) invert(1);"
+                     title="Stripe - Secure Payment Platform">
+            </div>
+            
+            <div class="payment-logo" style="background: white; padding: 0.8rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: all 0.3s ease;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" 
+                     alt="PayPal" 
+                     style="height: 25px; width: auto;"
+                     title="PayPal - Secure Payments">
+            </div>
+            
+            <div class="payment-logo" style="background: black; padding: 0.8rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: all 0.3s ease;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b0/Apple_Pay_logo.svg" 
+                     alt="Apple Pay" 
+                     style="height: 25px; width: auto; filter: brightness(0) invert(1);"
+                     title="Apple Pay - Secure Payments">
+            </div>
+        </div>
+
+        <div class="security-badges" style="display: flex; justify-content: center; align-items: center; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+
+            <div class="security-badge" style="display: flex; align-items: center; gap: 0.5rem; background: rgba(178, 178, 55, 0.1); padding: 0.6rem 1rem; border-radius: 20px; border: 1px solid #b2b237;">
+                <span style="color: #b2b237; font-size: 1.2rem;">✓</span>
+                <span style="color: white; font-size: 0.9rem; font-weight: 500;">SSL Secure</span>
+            </div>
+            
+            <div class="security-badge" style="display: flex; align-items: center; gap: 0.5rem; background: rgba(178, 178, 55, 0.1); padding: 0.6rem 1rem; border-radius: 20px; border: 1px solid #b2b237;">
+                <span style="color: #b2b237; font-size: 1.2rem;">✓</span>
+                <span style="color: white; font-size: 0.9rem; font-weight: 500;">256-bit Encrypted</span>
+            </div>
+            
+            <div class="security-badge" style="display: flex; align-items: center; gap: 0.5rem; background: rgba(178, 178, 55, 0.1); padding: 0.6rem 1rem; border-radius: 20px; border: 1px solid #b2b237;">
+                <span style="color: #b2b237; font-size: 1.2rem;">✓</span>
+                <span style="color: white; font-size: 0.9rem; font-weight: 500;">PCI Compliant</span>
+            </div>
+
+            <div class="security-badge" style="display: flex; align-items: center; gap: 0.5rem; background: rgba(178, 178, 55, 0.1); padding: 0.6rem 1rem; border-radius: 20px; border: 1px solid #b2b237;">
+                <span style="color: #b2b237; font-size: 1.2rem;">✓</span>
+                <span style="color: white; font-size: 0.9rem; font-weight: 500;">Trusted</span>
+            </div>
+        </div>
+
+        <p style="color: #ccc; font-size: 0.9rem; line-height: 1.5; max-width: 600px; margin: 0 auto;">
+            All transactions are protected by advanced encryption technology. We use <strong style="color: #b2b237;">Stripe</strong> 
+            for secure payment processing - your financial data never reaches our servers.
+        </p>
+
+        <div style="margin-top: 1rem; padding: 1rem; background: rgba(255, 255, 255, 0.05); border-radius: 10px; display: inline-block;">
+            <p style="color: #b2b237; margin: 0; font-size: 0.85rem; font-weight: 500;">
+                 Your security is our top priority
+            </p>
+        </div>
+
+    </div>
+</div>
+
+<style>
+
+    .payment-logo {
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .payment-logo:hover {
+        transform: translateY(-5px) scale(1.05);
+        box-shadow: 0 8px 25px rgba(178, 178, 55, 0.3) !important;
+    }
+    
+    .security-badge {
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .security-badge:hover {
+        background: rgba(178, 178, 55, 0.2) !important;
+        transform: translateY(-2px);
+    }
+    
+    @media (max-width: 768px) {
+        .payment-methods {
+            gap: 1rem;
+        }
+        
+        .payment-logo {
+            padding: 0.6rem !important;
+        }
+        
+        .payment-logo img {
+            height: 20px !important;
+        }
+        
+        .security-badges {
+            gap: 1rem;
+        }
+        
+        .security-badge {
+            padding: 0.5rem 0.8rem !important;
+        }
+        
+        .security-badge span:last-child {
+            font-size: 0.8rem !important;
+        }
+        
+        h3 {
+            font-size: 1.5rem !important;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .payment-methods {
+            gap: 0.8rem;
+        }
+        
+        .payment-logo {
+            padding: 0.5rem !important;
+        }
+        
+        .payment-logo img {
+            height: 18px !important;
+        }
+        
+        .security-badges {
+            gap: 0.8rem;
+        }
+        
+        .security-badge {
+            padding: 0.4rem 0.7rem !important;
+        }
+        
+        .security-badge span:last-child {
+            font-size: 0.75rem !important;
+        }
+        
+        h3 {
+            font-size: 1.3rem !important;
+        }
+        
+        p {
+            font-size: 0.8rem !important;
+            padding: 0 1rem;
+        }
+    }
+
+#checkoutModal .modal-content {
+    background: linear-gradient(180deg, rgba(39, 27, 73, 1) 0%, rgba(93, 65, 175, 1) 100%);
+    color: #fff;
+    border-radius: 20px;
+    padding: 25px 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    max-width: 450px;
+}
+
+#checkoutModal .form-group {
+    margin-bottom: 10px;
+}
+
+#checkoutModal input,
+#checkoutModal select,
+#checkoutModal textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 10px;
+    background: rgba(255,255,255,0.1);
+    color: white;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+#checkoutModal input::placeholder {
+    color: rgba(255,255,255,0.7);
+}
+
+#checkoutModal input:focus,
+#checkoutModal select:focus {
+    outline: none;
+    border-color: #b2b237;
+    background: rgba(255,255,255,0.15);
+}
+
+#checkoutModal select {
+    color: white;
+}
+
+#checkoutModal option {
+    color: black;
+}
+
+#checkoutModal .order-summary {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 15px;
+    padding: 20px;
+    margin: 25px 0;
+    color: white;
+}
+
+#checkoutModal .order-summary h3 {
+    color: #b2b237;
+    margin-bottom: 10px;
+}
+
+#checkoutModal .form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+#checkoutModal #confirmCheckout {
+    background-color: #4CAF50;
+    color: white;
+    font-weight: bold;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#checkoutModal #confirmCheckout:hover {
+    background-color: #45a049;
+    transform: translateY(-2px);
+}
+
+#checkoutModal #cancelCheckout {
+    background-color: #f44336;
+    color: white;
+    font-weight: bold;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#checkoutModal #cancelCheckout:hover {
+    background-color: #e53935;
+    transform: translateY(-2px);
+}
+
+</style>
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function() {
+
+        const paymentSection = document.querySelector('.payment-security-section');
+        if (paymentSection) {
+            paymentSection.style.opacity = '0';
+            paymentSection.style.transform = 'translateY(20px)';
+            paymentSection.style.transition = 'all 0.6s ease';
+            
+            setTimeout(() => {
+                paymentSection.style.opacity = '1';
+                paymentSection.style.transform = 'translateY(0)';
+            }, 300);
+        }
+        
+        const paymentLogos = document.querySelectorAll('.payment-logo');
+        paymentLogos.forEach(logo => {
+            logo.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            });
+        });
+        
+        const securityBadges = document.querySelectorAll('.security-badge');
+        securityBadges.forEach(badge => {
+            badge.addEventListener('click', function() {
+                this.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            });
+        });
+        
+        setInterval(() => {
+            securityBadges.forEach((badge, index) => {
+                setTimeout(() => {
+                    badge.style.transform = 'scale(1.02)';
+                    setTimeout(() => {
+                        badge.style.transform = '';
+                    }, 300);
+                }, index * 200);
+            });
+        }, 5000);
+    });
+</script>
+
+
+</body>
+</html>
